@@ -49,20 +49,20 @@ The application is divided into 5 services:
 Authorisation is managed by a JWT service
 
 ### Microservice Architecture
-Frontend
-    -   Reverse proxy
-        -   Serve static webpage
-    -   User frontend server
-        -   serve weather data with analysis
-    -   Admin frontend server
-        -   Administator uploads CSV files with raw data.
-Backend
-    -   MySQL Database
-        -   Stores raw data in tables
-    -   Analytics Server
-        -   Processes raw data for statistics
-    -   MongoDB Datastore
-        -   Serves post-processed data to User frontend Server
+**Frontend**
+-   Reverse proxy
+    -   Serve static webpage
+-   User frontend server
+    -   serve weather data with analysis
+-   Admin frontend server
+    -   Administator uploads CSV files with raw data.
+**Backend**
+-   MySQL Database
+    -   Stores raw data in tables
+-   Analytics Server
+    -   Processes raw data for statistics
+-   MongoDB Datastore
+    -   Serves post-processed data to User frontend Server
 
 ## Repository
 GitHub: https://github.com/xXDamoonXx/ACIT3495-Project
