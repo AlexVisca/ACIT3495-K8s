@@ -49,6 +49,7 @@ The application is divided into 5 services:
 Authorisation is managed by a JWT service
 
 ### Microservice Architecture
+
 **Frontend**
 -   Reverse proxy
     -   Serve static webpage
@@ -56,6 +57,7 @@ Authorisation is managed by a JWT service
     -   serve weather data with analysis
 -   Admin frontend server
     -   Administator uploads CSV files with raw data.
+
 **Backend**
 -   MySQL Database
     -   Stores raw data in tables
