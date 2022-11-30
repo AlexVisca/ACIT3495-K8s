@@ -2,78 +2,66 @@
 
 2022 (C) BCIT
 
-## Application Use-Case
-**Open Weather Service API** is built for weather monitoring agencies. It provides an application service to compute raw data that has been collected, and analzes and processes the raw data into a user-friendly Application Programming Interface for frontend applications
+## Application Scope
+**Open Weather Service API** is built for weather monitoring agencies to provide weather information services to end-users. It provides an application service to compute raw data that has been collected, and analzes and processes the raw data into a user-friendly Application Programming Interface (API) for frontend applications and websites.
 
-**Open Weather Service API** provides the following functionality:
+Open Weather Service provides the following functionality:
 
 -  Exposes an API to send data over HTTP to a frontend with API calls.
 -  Services are loosely coupled and scalable.
 
-### Microservices Design
-The application is divided into 5 services:
-1.  **Express.js** webclient
-2.  **MySQL** for raw data
-3.  **Node.js** analytics service
-4.  **MongoDB** for computed data
-5.  **Python-flask** application for API service
-
-Authorisation is managed by a JWT service
-
-
-## Architecture Description
 Open Weather Service works in the following steps: 
 
 1.  Weather data of temperatures is deposited by an administrator.
 2.  The temperature data is saved to a relational database.
-3.  The data is divided into tables by datetime.
-4.  The minimum value, maximum value, and average value is computed.
-5.  The computed values are saved in a non-relational database
-6.  The computed data is served over HTTP to a frontend with REST API calls.
+3.  The minimum value, maximum value, and average value is computed.
+4.  The computed values are saved in a non-relational database
+5.  The computed data is served over HTTP to a frontend with REST API calls.
 
 ### User Interfaces
 **Admin Client**
--   Weather Service portal for uploading raw temperature data.
--   Data can be uploaded as a Comma Separated Values (CSV) file.
--   Saves raw data and computed data in separate in containers
--   Requires Admin Authorisation
+-   Weather Service portal for uploading raw temperature data. Designed for daily uploads.
+-   Data can be uploaded as a Comma Separated Values (CSV) file or exported from a Microsoft Excel&copy; spreadsheet.
+-   Saves raw data to relational database containers.
+-   Requires Admin Authorisation.
 
 **User Client**
--  Weather application
--  Presents organised temperature information with useful summary
--  User account required for authorisation
+-   Easy-to-use Weather app for end-users and website API calls.
+-   Presents organised temperature information as a useful summary of minimum, maximum, and average values.
+-   Reads post-processed data from a NoSQL datastore as JSON objects.
+-   User account required for authorisation.
 
 ### Databases
 Uses two different databases.
-1.  MySQL for raw data. The data is divided into tables by datetime.
-2.  NoSQL(MongoDB) for computed data
-Raw data is computed for minimum, maximum, and average values.
+1.  MySQL for raw data. The data is divided into tables by datetime, and is designed to receive daily uploads.
+2.  NoSQL(MongoDB) for computed data saved as a collection of Javascript Object Notation (JSON) and is designed for constant uptime read operations.
 
 ## Microservice Architecture Description
+The application is divided into 6 microservices across the frontend and backend:
 
-**Frontend**
--   **Reverse proxy**: Serves a static webpage that receives data from the Frontend API's.
--   **Admin frontend server**: Administator uploads CSV files with raw data. CSV files are uploaded as a POST request from the input form
--   **User frontend server**: Serves weather data with analysis. Responds with JSON to GET requests from frontend.
+**Frontend**:
+-   **Reverse Proxy and Authentication Service**: Serves a static webpage and manages authorisation and authentication.
+-   **Admin Frontend Service**: Provides access for administators to upload CSV files with raw data. CSV files are uploaded as a POST request from the input form.
+-   **User Frontend Service**: Serves weather data to end-users. Responds to GET requests from user clients with a JSON response of post-processed information.
 
-**Backend**
+**Backend**:
 -   **MySQL Database**: Stores raw data in tables. Tables are created for each day.
--   **Analytics Server**: Processes raw data for statistics. The minimum value, maximum value, and average value is computed and saved to a MongoDB collection.
--   **MongoDB Datastore**: Serves post-processed data to User frontend Server
+-   **Analytics Service**: Processes raw data for statistics. The minimum value, maximum value, and average value is computed and saved as a JSON object.
+-   **MongoDB Datastore**: Serves post-processed data to User frontend Service
 
-### Horizontal Scalability
-
-<img src="figure_1.png">Figure 1: Data collection and Analytics System Architecture</img>
+### Horizontal Scalability Design
 
 **Application Scalability**:
 The frontend services are required to scale horizontally to reach a greater user base. In order to do this, not every part of of the application can scale well.
 
-The User frontend service can scale more than the other services because it has a smaller datastore with MongoDB which can handle scaling needs, and therefore can benefit from more replica sets in the Cluster. It also needs to reach users, which are the primary source of traffic.
+<img src="figure_1.png">Figure 1: Data collection and Analytics System Architecture</img>
 
-Tha Admin frontend does not need to scale as much, because there are not many administrators and the frontend service requires the MySQL database.
+The **User frontend** service can scale more than the other services because it has a smaller datastore with MongoDB which can handle scaling needs, and therefore can benefit from more replica sets in the Cluster. It also needs to reach users, which are the primary source of traffic. This is horizontally scaled by HTTP traffic to the API (Measured by CPU usage).
+
+Tha **Admin frontend** does not need to scale as much, because there are not many administrators and the frontend service requires the MySQL database.
 
 **Database Scalability**:
-The MongoDB datastore is updated with post-processed data from the analytics server from the MySQL database cluster, which does not scale well. However, as mentioned previously, it is not required. The Analytics service does neet to balance the lower scaling needs of the MySQL database, and reach the higher scaling needs of the MongoDB. This is the main point of failure in the application, and would require load balancing to manage properly.
+Databases were the main bottleneck for scaling. The MongoDB datastore is updated with post-processed data from the analytics server from the MySQL database cluster, which does not scale well. However, as mentioned previously, it is not required that the MySQL database scale as much as the MongoDB datastore. The Analytics service acts as an intermediary to balance the lower scaling needs of the MySQL database, and reach the higher scaling needs of the MongoDB datastore. This is the main point of failure in the application, and requires traffic-based load balancing to manage horizontal scaling needs.
 
 ## Repository
 GitHub: https://github.com/AlexVisca/ACIT3495-K8s.git
